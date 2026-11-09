@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f7f8fc" />
+  <title>과제체크 | 대학생 과제 관리</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="과제체크 홈">
+        <span class="brand-mark">✓</span>
+        <span>과제체크</span>
+      </a>
+      <div class="topbar-right">
+        <span id="mode-pill" class="mode-pill">연결 확인 중</span>
+        <button id="logout-btn" class="button button-quiet hidden" type="button">로그아웃</button>
+      </div>
+    </header>
+
+    <main>
+      <section id="auth-view" class="auth-layout">
+        <div class="hero-copy">
+          <p class="eyebrow">STUDENT TASK MANAGER</p>
+          <h1>과제와 마감일을<br /><span>한눈에 관리하세요.</span></h1>
+          <p class="hero-description">과목별 과제를 정리하고, 마감일을 놓치지 않도록 관리하는 대학생을 위한 간단한 도구입니다.</p>
+          <div class="feature-chips">
+            <span>과목별 정리</span><span>마감일 확인</span><span>마감 알림</span>
+          </div>
+        </div>
+        <div class="panel auth-panel">
+          <div class="panel-heading">
+            <p class="eyebrow">WELCOME</p>
+            <h2>시작하기</h2>
+            <p>이메일로 로그인하거나 데모 모드로 먼저 체험해 보세요.</p>
+          </div>
+          <form id="auth-form" class="stack">
+            <label>이메일
+              <input id="email-input" type="email" placeholder="student@example.com" autocomplete="email" required />
+            </label>
+            <label>비밀번호
+              <input id="password-input" type="password" placeholder="비밀번호 입력" autocomplete="current-password" minlength="6" required />
+            </label>
+            <div class="button-row">
+              <button class="button button-primary" type="submit" id="login-btn">로그인</button>
+              <button class="button button-secondary" type="button" id="signup-btn">회원가입</button>
+            </div>
+          </form>
+          <div class="or-divider"><span>또는</span></div>
+          <button id="demo-btn" class="button button-demo" type="button">데모 모드로 체험하기</button>
+          <p class="small-note">데모 모드의 데이터는 현재 브라우저에만 저장됩니다.</p>
+          <p id="auth-message" class="message" role="status"></p>
+        </div>
+      </section>
+
+      <section id="dashboard-view" class="hidden">
+        <div class="welcome-row">
+          <div>
+            <p class="eyebrow">MY STUDY SPACE</p>
+            <h1>나의 과제 관리</h1>
+            <p id="user-label" class="muted">오늘의 학습 일정을 확인해 보세요.</p>
+          </div>
+          <button id="notify-btn" class="button button-secondary" type="button">브라우저 알림 켜기</button>
+        </div>
+
+        <div id="demo-notice" class="notice hidden"><strong>데모 모드</strong> — 입력한 내용은 이 브라우저에만 저장됩니다. 실제 클라우드 저장을 테스트하려면 Firebase 설정을 완료하세요.</div>
+        <div id="firebase-notice" class="notice notice-blue hidden">클라우드 모드로 연결되었습니다. 로그인한 사용자별로 과제 데이터가 저장됩니다.</div>
+
+        <div class="stats-grid">
+          <article class="stat-card"><span>전체 과제</span><strong id="stat-total">0</strong><small>등록된 과제</small></article>
+          <article class="stat-card"><span>진행 중</span><strong id="stat-open">0</strong><small>아직 완료하지 않은 과제</small></article>
+          <article class="stat-card"><span>마감 임박</span><strong id="stat-soon">0</strong><small>24시간 이내 마감</small></article>
+          <article class="stat-card"><span>완료</span><strong id="stat-done">0</strong><small>완료 처리한 과제</small></article>
+        </div>
+
+        <div class="content-grid">
+          <section class="panel form-panel">
+            <div class="panel-heading">
+              <p class="eyebrow">NEW TASK</p>
+              <h2 id="form-title">과제 추가하기</h2>
+              <p>과목과 마감일을 입력해 과제를 등록하세요.</p>
+            </div>
+            <form id="task-form" class="stack">
+              <label>과목명
+                <input id="course-input" type="text" placeholder="예: 클라우드 컴퓨팅" maxlength="60" required />
+              </label>
+              <label>과제명
+                <input id="title-input" type="text" placeholder="예: 클라우드 구축계획서 작성" maxlength="100" required />
+              </label>
+              <label>마감일
+                <input id="due-input" type="datetime-local" required />
+              </label>
+              <label>메모 <span class="optional">선택</span>
+                <textarea id="note-input" rows="3" placeholder="제출 형식, 준비할 내용 등을 적어 두세요." maxlength="500"></textarea>
+              </label>
+              <div class="button-row">
+                <button id="save-task-btn" class="button button-primary" type="submit">과제 저장</button>
+                <button id="cancel-edit-btn" class="button button-quiet hidden" type="button">수정 취소</button>
+              </div>
+            </form>
+            <p id="task-message" class="message" role="status"></p>
+          </section>
+
+          <section class="panel tasks-panel">
+            <div class="tasks-heading">
+              <div class="panel-heading">
+                <p class="eyebrow">TASK LIST</p>
+                <h2>과제 목록</h2>
+                <p>마감일이 가까운 과제부터 표시됩니다.</p>
+              </div>
+              <select id="filter-select" aria-label="과제 필터">
+                <option value="all">전체 보기</option>
+                <option value="open">진행 중</option>
+                <option value="done">완료</option>
+                <option value="overdue">마감 지남</option>
+              </select>
+            </div>
+            <div id="empty-state" class="empty-state">
+              <div class="empty-icon">✓</div>
+              <strong>아직 등록된 과제가 없습니다.</strong>
+              <span>왼쪽 입력창에서 첫 과제를 추가해 보세요.</span>
+            </div>
+            <div id="task-list" class="task-list"></div>
+          </section>
+        </div>
+        <p class="footer-note">과제체크는 학습용 시범 시스템입니다. 중요한 과제는 학교 LMS에도 별도로 확인하세요.</p>
+      </section>
+    </main>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
